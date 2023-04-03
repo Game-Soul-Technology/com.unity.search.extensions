@@ -46,18 +46,18 @@ namespace UnityEditor.Search
         [SerializeField] DependencyViewSplitterInfo m_Splitter;
         [SerializeField] DependencyViewerState m_CurrentState;
         [SerializeField] bool m_ShowSceneRefs = true;
-        #if UNITY_2022_2_OR_NEWER
+        // #if UNITY_2022_2_OR_NEWER
         [SerializeField] int m_DependencyDepthLevel = 1;
-        #endif
+        // #endif
 
         const int k_MaxHistorySize = 10;
         int m_HistoryCursor = -1;
         List<DependencyViewerState> m_History;
         List<DependencyTableView> m_Views;
 
-        #if UNITY_2022_2_OR_NEWER
+        // #if UNITY_2022_2_OR_NEWER
         public bool showDepthSlider => m_Views?.Any(view => view?.state?.supportsDepth ?? false) ?? false;
-        #endif
+        // #endif
         public bool showSceneRefs => m_ShowSceneRefs;
         public bool hasIndex { get; set; }
         public bool wantsRebuild { get; set; }
@@ -87,9 +87,9 @@ namespace UnityEditor.Search
 
         internal void OnEnable()
         {
-            #if UNITY_2022_2_OR_NEWER
+            // #if UNITY_2022_2_OR_NEWER
             m_DependencyDepthLevel = m_DependencyDepthLevel <= 0 ? 1 : m_DependencyDepthLevel;
-            #endif
+            // #endif
 
             titleContent = new GUIContent("Dependency Viewer", EditorGUIUtility.FindTexture("Search Icon"));
             m_Splitter = m_Splitter ?? new DependencyViewSplitterInfo(DependencyViewSplitterInfo.Side.Left, 0.1f, 0.9f, this);
@@ -145,7 +145,7 @@ namespace UnityEditor.Search
                         m_CurrentState.Ping();
                     GUILayout.FlexibleSpace();
 
-                    #if UNITY_2022_2_OR_NEWER
+                    // #if UNITY_2022_2_OR_NEWER
                     if (showDepthSlider)
                     {
                         EditorGUI.BeginChangeCheck();
@@ -158,7 +158,7 @@ namespace UnityEditor.Search
                             RefreshState();
                         }
                     }
-                    #endif
+                    // #endif
 
                     var old = m_ShowSceneRefs;
                     GUILayout.Label(Styles.sceneRefs, GUILayout.Height(18f), GUILayout.Width(65f));
@@ -326,9 +326,9 @@ namespace UnityEditor.Search
         {
             m_CurrentState = state;
 
-            #if UNITY_2022_2_OR_NEWER
+            // #if UNITY_2022_2_OR_NEWER
             m_DependencyDepthLevel = state.config.depthLevel;
-            #endif
+            // #endif
             m_ShowSceneRefs = state.config.flags.HasFlag(DependencyViewerFlags.ShowSceneRefs);
             m_Views = BuildViews(m_CurrentState);
             titleContent = m_CurrentState.windowTitle;
@@ -344,9 +344,9 @@ namespace UnityEditor.Search
         internal DependencyViewerConfig GetConfig()
         {
             return new DependencyViewerConfig(GetViewerFlags()
-                #if UNITY_2022_2_OR_NEWER
+                // #if UNITY_2022_2_OR_NEWER
                 , m_DependencyDepthLevel
-                #endif
+                // #endif
             );
         }
 

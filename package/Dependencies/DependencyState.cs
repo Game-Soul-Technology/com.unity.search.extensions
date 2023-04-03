@@ -9,9 +9,9 @@ namespace UnityEditor.Search
     {        
         public string name;
 
-        #if UNITY_2022_2_OR_NEWER
+        // #if UNITY_2022_2_OR_NEWER
         public bool supportsDepth;
-        #endif
+        // #endif
 
         [NonSerialized] private SearchTable m_TableConfig;
         [SerializeField] private SearchViewState m_ViewState;

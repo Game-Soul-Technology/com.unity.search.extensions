@@ -142,9 +142,9 @@ namespace UnityEditor.Search
             var fetchSceneRefs = config.flags.HasFlag(DependencyViewerFlags.ShowSceneRefs);
             var providers = fetchSceneRefs ? new[] { "expression", "dep", "scene" } : new[] { "expression", "dep" };
             var query = Dependency.CreateUsingQuery(selectedPaths
-                #if UNITY_2022_2_OR_NEWER
+                // #if UNITY_2022_2_OR_NEWER
                 , config.depthLevel
-                #endif
+                // #endif
             );
             if (selectedInstanceIds.Count > 0)
             {
@@ -167,9 +167,9 @@ namespace UnityEditor.Search
             {
                 state.states.Add(new DependencyState("Uses", SearchService.CreateContext(providers, query))
                 {
-                    #if UNITY_2022_2_OR_NEWER
+                    // #if UNITY_2022_2_OR_NEWER
                     supportsDepth = true
-                    #endif
+                    // #endif
                 });
             }
             if (config.flags.HasFlag(DependencyViewerFlags.UsedBy))

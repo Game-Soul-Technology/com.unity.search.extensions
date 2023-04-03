@@ -32,15 +32,15 @@ namespace UnityEditor.Search
         public DependencyViewerConfig(DependencyViewerFlags flags, int depthLevel = 1)
         {
             this.flags = flags;
-            #if UNITY_2022_2_OR_NEWER
+            // #if UNITY_2022_2_OR_NEWER
             this.depthLevel = depthLevel;
-            #endif
+            // #endif
         }
 
         public DependencyViewerFlags flags;
-        #if UNITY_2022_2_OR_NEWER
+        // #if UNITY_2022_2_OR_NEWER
         public int depthLevel;
-        #endif
+        // #endif
     }
 
     [Serializable]

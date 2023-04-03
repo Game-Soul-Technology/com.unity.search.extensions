@@ -175,11 +175,11 @@ namespace UnityEditor.Search
             var initialSetQuery = escapedPaths.Count() == 1 ? $"from={escapedPaths.First()}" : $"from=[{string.Join(",", escapedPaths)}]";
             if (depthLevel == 1)
                 return initialSetQuery;
-            #if UNITY_2022_2_OR_NEWER
+            // #if UNITY_2022_2_OR_NEWER
             return $"aggregate{{{initialSetQuery}, from=\"@path\", {depthLevel - 1}, {refDepthField}, keep, sort}}";
-            #else
-            throw new NotSupportedException("Dependency depth level is not supported in this version");
-            #endif
+            // #else
+            // throw new NotSupportedException("Dependency depth level is not supported in this version");
+            // #endif
         }
 
         [MenuItem("Assets/Dependencies/Find Used By (References)", priority = 10100)]
