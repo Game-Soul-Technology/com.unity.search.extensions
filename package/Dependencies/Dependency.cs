@@ -1,4 +1,5 @@
 //#define DEBUG_DEPENDENCY_INDEXING
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -47,9 +48,9 @@ namespace UnityEditor.Search
                 trackSelection = TrackSelection,
                 toObject = ToObject,
                 startDrag = StartDrag,
-                #if USE_QUERY_BUILDER
+#if USE_QUERY_BUILDER
                 fetchPropositions = FetchPropositions
-                #endif
+#endif
             };
         }
 
@@ -58,7 +59,7 @@ namespace UnityEditor.Search
             return "first{25,sort{select{p:a:assets, @path, count{dep:ref=\"@path\"}}, @value, desc}}";
         }
 
-        #if USE_QUERY_BUILDER
+#if USE_QUERY_BUILDER
         private static IEnumerable<SearchProposition> FetchPropositions(SearchContext context, SearchPropositionOptions options)
         {
             string currentSelectedPath = null;
@@ -73,7 +74,7 @@ namespace UnityEditor.Search
             yield return new SearchProposition(category: null, label: "Broken Assets",
                 replacement: $"is:broken", icon: SearchUtils.GetTypeIcon(typeof(UnityEngine.Object)));
         }
-        #endif
+#endif
 
         [SearchActionsProvider]
         internal static IEnumerable<SearchAction> ActionHandlers()
@@ -117,6 +118,23 @@ namespace UnityEditor.Search
             Task.Run(() => RunThreadIndexing(index));
         }
 
+        public static void BuildImmediate()
+        {
+            usedByCounts.Clear();
+            index = new DependencyIndexer();
+            index.Setup();
+
+            index.Finish();
+            var metaFiles = EnumerateFiles().ToArray();
+            index.Start();
+            index.Build(-1, metaFiles);
+            index.Finish(bytes =>
+            {
+                File.WriteAllBytes(dependencyIndexLibraryPath, bytes);
+                indexingFinished?.Invoke();
+            }, removedDocuments: null);
+        }
+
         [MenuItem("Window/Search/Dependencies", priority = 5678)]
         internal static void OpenDependencySearch()
         {
@@ -155,7 +173,7 @@ namespace UnityEditor.Search
             if (!obj)
                 return;
             var path = AssetDatabase.GetAssetPath(obj);
-            var query = CreateUsingQuery(new[] { path }, 10 );
+            var query = CreateUsingQuery(new[] { path }, 10);
             var searchContext = SearchService.CreateContext(new[] { "dep", "scene", "asset", "adb" }, query);
             SearchService.ShowWindow(searchContext, "Dependencies (Uses)", saveFilters: false);
         }
@@ -175,11 +193,11 @@ namespace UnityEditor.Search
             var initialSetQuery = escapedPaths.Count() == 1 ? $"from={escapedPaths.First()}" : $"from=[{string.Join(",", escapedPaths)}]";
             if (depthLevel == 1)
                 return initialSetQuery;
-            #if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_2_OR_NEWER
             return $"aggregate{{{initialSetQuery}, from=\"@path\", {depthLevel - 1}, {refDepthField}, keep, sort}}";
-            #else
+#else
             throw new NotSupportedException("Dependency depth level is not supported in this version");
-            #endif
+#endif
         }
 
         [MenuItem("Assets/Dependencies/Find Used By (References)", priority = 10100)]
@@ -335,7 +353,7 @@ namespace UnityEditor.Search
                     Progress.Finish(progressId, Progress.Status.Succeeded);
 
                     Debug.Log($"Dependency indexing took {sw.Elapsed.TotalMilliseconds,3:0.##} ms " +
-                        $"and was saved at {dependencyIndexLibraryPath} ({EditorUtility.FormatBytes(bytes.Length)} bytes)");
+                              $"and was saved at {dependencyIndexLibraryPath} ({EditorUtility.FormatBytes(bytes.Length)} bytes)");
 
                     indexingFinished?.Invoke();
                 }, removedDocuments: null);
@@ -493,8 +511,8 @@ namespace UnityEditor.Search
             }
 
             foreach (Match match in fromRx.Matches(context.searchQuery))
-                foreach (var r in GetADBDependencies(match, context, provider))
-                    yield return r;
+            foreach (var r in GetADBDependencies(match, context, provider))
+                yield return r;
         }
 
         private static IEnumerable<SearchItem> GetADBDependencies(Match match, SearchContext context, SearchProvider provider)
@@ -518,10 +536,10 @@ namespace UnityEditor.Search
         {
             if (!success)
                 Debug.LogError($"Failed to load dependency index at {indexPath}");
-            #if DEBUG_DEPENDENCY_INDEXING
+#if DEBUG_DEPENDENCY_INDEXING
             else
                 Debug.Log($"Loading dependency index took {sw.Elapsed.TotalMilliseconds,3:0.##} ms ({EditorUtility.FormatBytes(indexBytes.Length)})");
-            #endif
+#endif
             SearchMonitor.contentRefreshed -= OnContentChanged;
             SearchMonitor.contentRefreshed += OnContentChanged;
             needUpdate = !GetDiff().empty;
@@ -560,7 +578,7 @@ namespace UnityEditor.Search
                 File.WriteAllBytes(dependencyIndexLibraryPath, bytes);
 
                 Debug.Log($"Dependency incremental update took {sw.Elapsed.TotalMilliseconds,3:0.##} ms " +
-                    $"and was saved at {dependencyIndexLibraryPath} ({EditorUtility.FormatBytes(bytes.Length)} bytes)");
+                          $"and was saved at {dependencyIndexLibraryPath} ({EditorUtility.FormatBytes(bytes.Length)} bytes)");
 
                 finished?.Invoke();
                 Progress.Finish(updateProgressId);
@@ -576,6 +594,7 @@ namespace UnityEditor.Search
                 {
                     return (int)field.value + 1;
                 }
+
                 return 1;
             };
         }
